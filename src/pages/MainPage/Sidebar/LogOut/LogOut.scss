@@ -1,0 +1,17 @@
+.sidabarBottom {
+	display: flex;
+	justify-content: center;
+	padding-bottom: 18px;
+}
+.sidabarBottom button {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	font-size: 20px;
+}
+
+.sidabarBottom svg {
+	margin-right: 10px;
+	fill: white;
+}

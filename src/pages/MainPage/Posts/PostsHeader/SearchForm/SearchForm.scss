@@ -1,0 +1,16 @@
+.searchForm {
+	width: 250px;
+	display: flex;
+	align-items: center;
+	border-bottom: 1px solid #000;
+	justify-content: space-between;
+	padding: 2px 5px;
+}
+
+.searchForm img {
+	width: 18px;
+}
+.searchForm input {
+	font-size: 18px;
+	width: 80%;
+}
