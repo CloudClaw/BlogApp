@@ -1,60 +1,66 @@
 import React from 'react';
-import axios from 'axios';
 
 import { Post } from './Post/Post';
 import { PostsHeader } from './PostsHeader/PostsHeader';
-import { Editform } from './EditForm/Editform';
 import { useHistory } from 'react-router-dom';
 
-import './Posts.scss';
-import { POST_URL } from '../../../helpers/constants';
+import { Modal, Spin } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
-export const Posts = ({ title, isLikedPosts = false, posts, isLoading, setPosts, error }) => {
+import './Posts.scss';
+
+import { deletePost, fetchPosts, likePost, setPosts } from '../../../store/slices/posts';
+
+import { useDispatch } from 'react-redux';
+import { Editform } from '../../../components/EditForm/Editform';
+
+export const Posts = ({ title, isLikedPosts = true, posts, error, isLoading }) => {
   const history = useHistory();
   const [selectedPost, setSelectedPost] = React.useState();
   const [showEditForm, setShowEditForm] = React.useState(false);
 
-  const likedPosts = posts.filter((post) => post.liked);
+  const dispatch = useDispatch();
 
-  const likePost = async (index) => {
+  React.useEffect(() => {
+    dispatch(fetchPosts());
+  }, [dispatch]);
+
+  const handleLikePost = async (index) => {
     const updatedPosts = [...posts];
-    updatedPosts[index].liked = !updatedPosts[index].liked;
-
-    try {
-      await axios
-        .put(POST_URL + '/' + updatedPosts[index].id, updatedPosts[index])
-        .then((updatedPostFromServer) => {
-          updatedPosts[index] = updatedPostFromServer.data;
-          setPosts(updatedPosts);
-        });
-    } catch (error) {
-      console.log(error);
-    }
+    updatedPosts[index] = { ...updatedPosts[index], liked: !updatedPosts[index].liked };
+    dispatch(likePost(updatedPosts[index]));
   };
 
-  const deletePost = async (postId) => {
-    try {
-      if (window.confirm('Удалить пост ?')) {
-        await axios.delete(POST_URL + '/' + postId).then(() => {
-          setPosts(
-            posts.filter((post) => {
-              return post.id !== postId;
-            }),
-          );
-          history.goBack();
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const { confirm } = Modal;
+
+  function handleDeletePost(postId) {
+    confirm({
+      title: 'Удалить пост?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Some descriptions',
+      okText: 'Да',
+      okType: 'danger',
+      cancelText: 'Нет',
+      onOk() {
+        dispatch(deletePost(postId));
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  }
 
   const selectPost = (post) => {
     setSelectedPost(post);
     setShowEditForm(true);
   };
 
-  if (isLoading) return <h1>Получаем данные...</h1>;
+  if (isLoading)
+    return (
+      <h1>
+        <Spin size="large" />
+      </h1>
+    );
   if (error) return <h1>{error.message}</h1>;
 
   return (
@@ -62,13 +68,13 @@ export const Posts = ({ title, isLikedPosts = false, posts, isLoading, setPosts,
       <PostsHeader title={title} isLikedPosts={isLikedPosts} posts={posts} setPosts={setPosts} />
 
       <section className="posts">
-        {(isLikedPosts ? likedPosts : posts).map((post, index) => {
+        {posts.map((post, index) => {
           return (
             <Post
               {...post}
               key={`${post}_${index}`}
-              like={() => likePost(index)}
-              deletePost={() => deletePost(post.id)}
+              like={() => handleLikePost(index)}
+              deletePost={() => handleDeletePost(post.id)}
               selectPost={() => selectPost(post)}
             />
           );

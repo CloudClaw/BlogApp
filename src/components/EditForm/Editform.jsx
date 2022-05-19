@@ -1,14 +1,16 @@
-import axios from 'axios';
 import React from 'react';
+import { useDispatch } from 'react-redux';
 
-import { ReactComponent as CloseIcon } from '../../../assets/img/close.svg';
-import { POST_URL } from '../../../helpers/constants';
+import { ReactComponent as CloseIcon } from '../../assets/img/close.svg';
+import { editPost } from '../../store/slices/posts';
 
 import './EditForm.scss';
 
-export const Editform = ({ setPosts, singlePost, setSinglePost, setShowEditForm }) => {
-  const [postTitle, setPostTitle] = React.useState(singlePost?.title);
-  const [postDesc, setPostDesc] = React.useState(singlePost?.description);
+export const Editform = ({ selectedPost, setShowEditForm }) => {
+  const [postTitle, setPostTitle] = React.useState(selectedPost?.title);
+  const [postDesc, setPostDesc] = React.useState(selectedPost?.description);
+
+  const dispatch = useDispatch();
 
   const handlePostTitleChange = (e) => {
     setPostTitle(e.target.value);
@@ -17,32 +19,23 @@ export const Editform = ({ setPosts, singlePost, setSinglePost, setShowEditForm 
     setPostDesc(e.target.value);
   };
 
-  const editPost = async (e) => {
+  const handleEditPost = async (e) => {
     e.preventDefault();
 
     const updatedPost = {
-      ...singlePost,
+      ...selectedPost,
       title: postTitle,
       description: postDesc,
     };
 
-    try {
-      await axios.put(POST_URL + '/' + singlePost.id, updatedPost).then((updatedPostFromServer) => {
-        setSinglePost(updatedPostFromServer.data);
-        setShowEditForm(false);
-      });
-      await axios.get(POST_URL).then((response) => {
-        setPosts(response.data);
-      });
-    } catch (error) {
-      console.log(console.error());
+    dispatch(editPost(updatedPost)).finally(() => {
       setShowEditForm(false);
-    }
+    });
   };
 
   return (
     <>
-      <form className="editForm" onSubmit={editPost}>
+      <form className="editForm" onSubmit={handleEditPost}>
         <button className="hideBtn" onClick={() => setShowEditForm(false)}>
           <CloseIcon />
         </button>

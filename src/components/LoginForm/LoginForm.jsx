@@ -3,8 +3,11 @@ import React from 'react';
 import './LoginForm.scss';
 import { ReactComponent as CloseIcon } from '../../assets/img/close.svg';
 import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logIn } from '../../store/slices/auth';
+import { Spin } from 'antd';
 
-export const LoginForm = ({ setLoginFormView, setIsLoggeIn }) => {
+export const LoginForm = ({ setLoginFormView }) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [emailDirty, setEmailDirty] = React.useState(false);
@@ -13,10 +16,13 @@ export const LoginForm = ({ setLoginFormView, setIsLoggeIn }) => {
   const [passwordError, setPasswordError] = React.useState('Поле не может быть пустым');
   const [formValid, setFormValid] = React.useState(false);
 
+  const [loading, setLoading] = React.useState(false);
+
   const loginRef = React.useRef();
   const passwordRef = React.useRef();
 
   const history = useHistory();
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     if (emailError || passwordError) {
@@ -65,14 +71,18 @@ export const LoginForm = ({ setLoginFormView, setIsLoggeIn }) => {
 
   const handleLogIn = (e) => {
     e.preventDefault();
-	 
-    const userData = {
-      login: loginRef.current.value,
-      password: passwordRef.current.value,
-    };
-    localStorage.setItem('isLoggedIn', true);
-    setIsLoggeIn(true);
-	 history.push('/')
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      console.log(loading);
+      const userData = {
+        login: loginRef.current.value,
+        password: passwordRef.current.value,
+      };
+
+      dispatch(logIn());
+      history.push('/');
+    }, 2000);
   };
 
   return (
@@ -101,9 +111,11 @@ export const LoginForm = ({ setLoginFormView, setIsLoggeIn }) => {
             type="password"
             placeholder="Введите пароль"
           />
+
           <button type="submit" disabled={!formValid}>
             Войти
           </button>
+          {loading && <Spin size="large" />}
         </form>
       </div>
     </div>

@@ -2,12 +2,15 @@ import React from 'react';
 
 import './AddForm.scss';
 import { ReactComponent as CloseIcon } from '../../../../../assets/img/close.svg';
-import { POST_URL } from '../../../../../helpers/constants';
-import axios from 'axios';
+import placeHolderIcon from '../../../../../assets/img/placeholder.png';
+import { createNewPost } from '../../../../../store/slices/posts';
+import { useDispatch } from 'react-redux';
 
-export const AddForm = ({ posts, setShowAddForm, setPosts }) => {
+export const AddForm = ({ posts, setShowAddForm }) => {
   const [postTitle, setPostTitle] = React.useState('');
   const [postDesc, setPostDesc] = React.useState('');
+
+  const dispatch = useDispatch();
 
   const handlePostTitleChange = (e) => {
     setPostTitle(e.target.value);
@@ -16,29 +19,22 @@ export const AddForm = ({ posts, setShowAddForm, setPosts }) => {
     setPostDesc(e.target.value);
   };
 
-  const createPost = async (e) => {
+  const handleCreatePost = async (e) => {
     e.preventDefault();
 
     const newPost = {
       title: postTitle,
       description: postDesc,
       liked: false,
-      thumbnail: posts[0].thumbnail,
+      thumbnail: posts[0]?.thumbnail || placeHolderIcon,
     };
 
-    try {
-      await axios.post(POST_URL, newPost).then((newPostFromServer) => {
-        setPosts([...posts, newPostFromServer.data]);
-        setShowAddForm(false);
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    dispatch(createNewPost(newPost)).finally(() => setShowAddForm(false));
   };
 
   return (
     <>
-      <form className="addPostForm" onSubmit={createPost}>
+      <form className="addPostForm" onSubmit={handleCreatePost}>
         <button className="hideBtn" onClick={() => setShowAddForm(false)}>
           <CloseIcon />
         </button>

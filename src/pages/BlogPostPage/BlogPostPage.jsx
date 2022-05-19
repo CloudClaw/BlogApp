@@ -2,16 +2,20 @@ import React from 'react';
 import { useHistory, useParams } from 'react-router-dom/cjs/react-router-dom.min';
 import { POST_URL } from '../../helpers/constants';
 import { useGetSinglePost } from '../../helpers/getPosts';
+import { Modal, Spin } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 import { ReactComponent as HeartIcon } from '../../assets/img/heart.svg';
 import { ReactComponent as TrashIcon } from '../../assets/img/trash.svg';
 import { ReactComponent as EditIcon } from '../../assets/img/pen.svg';
-import axios from 'axios';
-import { Editform } from '../BlogPostPage/EditForm/Editform';
+import { useDispatch } from 'react-redux';
+import { deletePost, likePost } from '../../store/slices/posts';
+import { Editform } from '../../components/EditForm/Editform';
 
-export const BlogPostPage = ({ setPosts }) => {
+export const BlogPostPage = () => {
   const { postId } = useParams();
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const [showEditForm, setShowEditForm] = React.useState(false);
 
@@ -21,32 +25,35 @@ export const BlogPostPage = ({ setPosts }) => {
 
   const customFilling = liked ? 'crimson' : 'black';
 
-  const like = async () => {
+  const handleLikePost = async () => {
     const updatedPost = { ...singlePost, liked: !singlePost.liked };
-
-    try {
-      await axios.put(POST_URL + '/' + postId, updatedPost).then((updatedPostFromServer) => {
-        setSinglePost(updatedPostFromServer.data);
-      });
-      await axios.get(POST_URL).then((response) => {
-        setPosts(response.data);
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    dispatch(likePost(updatedPost)).then(() => {
+      setSinglePost(updatedPost);
+    });
   };
 
-  const deletePost = async () => {
-    try {
-      if (window.confirm('Удалить пост ?')) {
-        await axios.delete(POST_URL + '/' + postId);
-        await axios.get(POST_URL).then((response) => {
-          setPosts(response.data);
-          history.goBack();
-        });
-      }
-    } catch (error) {
-      console.log(error);
+  const { confirm } = Modal;
+
+  function showDeleteConfirm() {
+    confirm({
+      title: 'Удалить пост?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Some descriptions',
+      okText: 'Да',
+      okType: 'danger',
+      cancelText: 'Нет',
+      onOk() {
+        console.log('OK');
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  }
+
+  const handleDeletePost = async () => {
+    if (showDeleteConfirm()) {
+      dispatch(deletePost(postId)).then(() => history.goBack());
     }
   };
 
@@ -54,7 +61,12 @@ export const BlogPostPage = ({ setPosts }) => {
     setShowEditForm(true);
   };
 
-  if (isLoading) return <h1>Получаем данные...</h1>;
+  if (isLoading)
+    return (
+      <h1>
+        <Spin size="large" />
+      </h1>
+    );
   if (error) return <h1>{error.message}</h1>;
 
   return (
@@ -63,10 +75,10 @@ export const BlogPostPage = ({ setPosts }) => {
       <h2>{title}</h2>
       <p>{description}</p>
       <div className="buttons">
-        <button onClick={like} className="likeBtn">
+        <button onClick={handleLikePost} className="likeBtn">
           <HeartIcon fill={customFilling} />
         </button>
-        <button onClick={deletePost} className="deleteBtn">
+        <button onClick={handleDeletePost} className="deleteBtn">
           <TrashIcon />
         </button>
         <button onClick={handleEditFormSHow} className="selectBtn">
@@ -74,14 +86,7 @@ export const BlogPostPage = ({ setPosts }) => {
         </button>
       </div>
 
-      {showEditForm && (
-        <Editform
-          singlePost={singlePost}
-          setSinglePost={setSinglePost}
-          setShowEditForm={setShowEditForm}
-			 setPosts={setPosts}
-        />
-      )}
+      {showEditForm && <Editform selectedPost={singlePost} setShowEditForm={setShowEditForm} />}
     </div>
   );
 };

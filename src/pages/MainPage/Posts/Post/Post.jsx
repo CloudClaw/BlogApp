@@ -16,20 +16,14 @@ export const Post = ({
   thumbnail = imagePlaceholder,
   like,
   deletePost,
-  id
+  id,
 }) => {
   const customFilling = liked ? 'crimson' : 'black';
 
   const customDescription = (
     <p>
-      {description.length > 100 ? (
-        <>
-          {description.slice(0, 101)}...
-          <Link to={`/blog/${id}`}>Подробнее</Link>
-        </>
-      ) : (
-        description
-      )}
+      {description.length > 100 ? <>{description.slice(0, 101)}...</> : description}&nbsp;&nbsp;
+      <Link to={`/blog/${id}`}>Подробнее</Link>
     </p>
   );
 

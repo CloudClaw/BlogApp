@@ -1,13 +1,15 @@
 import React from 'react';
 import './EditUserData.scss';
 import { ReactComponent as CloseIcon } from '../../../../assets/img/close.svg';
-import axios from 'axios';
-import { USER_URL } from '../../../../helpers/constants';
+import { useDispatch } from 'react-redux';
+import { editUsers } from '../../../../store/slices/users';
 
-export const EditUserData = ({ selectedUser, setShowEditUserForm, setUsers }) => {
+export const EditUserData = ({ selectedUser, setShowEditUserForm }) => {
   const [selectName, setSelectName] = React.useState(selectedUser?.name);
   const [selectLastname, setSelectLastname] = React.useState(selectedUser?.lastname);
   const [selectEmail, setSelectEmail] = React.useState(selectedUser?.email);
+
+  const dispatch = useDispatch();
 
   const handleNameChange = (e) => {
     setSelectName(e.target.value);
@@ -19,7 +21,7 @@ export const EditUserData = ({ selectedUser, setShowEditUserForm, setUsers }) =>
     setSelectEmail(e.target.value);
   };
 
-  const editUserData = async (e) => {
+  const handleEditUser = async (e) => {
     e.preventDefault();
 
     const newUserData = {
@@ -29,20 +31,12 @@ export const EditUserData = ({ selectedUser, setShowEditUserForm, setUsers }) =>
       email: selectEmail,
     };
 
-    try {
-      await axios.put(USER_URL + '/' + selectedUser.id, newUserData);
-      await axios.get(USER_URL).then((usersFromServer) => {
-        setUsers(usersFromServer.data);
-      });
-      setShowEditUserForm(false);
-    } catch (error) {
-      console.log(error);
-    }
+    dispatch(editUsers(newUserData)).finally(setShowEditUserForm(false));
   };
 
   return (
     <>
-      <form className="editForm" onSubmit={editUserData}>
+      <form className="editForm" onSubmit={handleEditUser}>
         <button className="hideBtn" onClick={() => setShowEditUserForm(false)}>
           <CloseIcon />
         </button>

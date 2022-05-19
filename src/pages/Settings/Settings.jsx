@@ -2,7 +2,7 @@ import React from 'react';
 import './Settings.scss';
 import { UserData } from './UserData/UserData';
 
-export const Settings = ({ title, users, setUsers }) => {
+export const Settings = ({ title, users }) => {
   const [selectedUser, setSelectedUser] = React.useState();
   const [showEditUserForm, setShowEditUserForm] = React.useState(false);
 
@@ -11,6 +11,7 @@ export const Settings = ({ title, users, setUsers }) => {
     setSelectedUser(user);
     setShowEditUserForm(true);
   };
+  
   return (
     <div className="settings">
       <h1 className="settings__header">{title}</h1>
@@ -26,7 +27,6 @@ export const Settings = ({ title, users, setUsers }) => {
               selectUser={()=>selectUser(user)}
               selectedUser={selectedUser}
               showEditUserForm={showEditUserForm}
-              setUsers={setUsers}
             />
           );
         })}

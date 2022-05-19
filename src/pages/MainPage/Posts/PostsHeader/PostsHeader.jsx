@@ -9,7 +9,7 @@ export const PostsHeader = ({ title, isLikedPosts, posts, addNewPost, setPosts }
   return (
     <section className="postsHeader">
       <h1>{title}</h1>
-      {!isLikedPosts && (
+      {isLikedPosts && (
         <button
           onClick={() => {
             setShowAddForm(true);

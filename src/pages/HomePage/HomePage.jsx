@@ -6,7 +6,7 @@ import { LoginForm } from '../../components/LoginForm/LoginForm';
 import { HomePageHeader } from './HomePageHeader/HomePageHeader';
 import { Slider } from '../../components/Slider/Slider';
 
-export const HomePage = ({ setIsLoggeIn }) => {
+export const HomePage = ({ setIsLoggeIn}) => {
   const [LoginFormView, setLoginFormView] = React.useState(false);
 
   const openLoginForm = () => {
@@ -37,7 +37,7 @@ export const HomePage = ({ setIsLoggeIn }) => {
         </p>
       </div>
       {LoginFormView && (
-        <LoginForm setIsLoggeIn={setIsLoggeIn} setLoginFormView={() => setLoginFormView(false)} />
+        <LoginForm setIsLoggeIn={setIsLoggeIn} setLoginFormView={() => setLoginFormView(false)}/>
       )}
     </div>
   );

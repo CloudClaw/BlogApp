@@ -8,40 +8,41 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import { Favourite } from '../Favourite/Favourite';
 import { USER_URL } from '../../helpers/constants';
 import { Settings } from '../Settings/Settings';
-import axios from 'axios';
 import { BlogPostPage } from '../BlogPostPage/BlogPostPage';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers, selectUsers } from '../../store/slices/users';
+import { selectPostsData } from '../../store/slices/posts';
 
-export const MainPage = ({ setIsLoggeIn, postsData }) => {
-  const [users, setUsers] = React.useState([]);
-
+export const MainPage = () => {
+  const [isLikedPosts, setIsLikedPosts] = React.useState(false);
+  const dispatch = useDispatch();
+  const { list: posts, isLoading, error } = useSelector(selectPostsData);
+  const users = useSelector(selectUsers);
   React.useEffect(() => {
-    const getUsers = async () => {
-      await axios.get(USER_URL).then((usersFromServer) => {
-        setUsers(usersFromServer.data);
-      });
-    };
-    getUsers();
-  }, []);
+    dispatch(fetchUsers());
+  }, [USER_URL]);
+
+  const likedPosts = posts.filter((post) => post.liked);
 
   return (
     <>
-      <Sidebar thumbnail={users.thumbnail} setIsLoggeIn={setIsLoggeIn} />
+      <Sidebar thumbnail={users.thumbnail} />
       <main className="mainBlock">
         <Switch>
           <Route exact path="/blog">
-            <Posts title="Posts" {...postsData} />
+            <Posts title="Posts" posts={posts} isLoading={isLoading} error={error}/>
           </Route>
 
           <Route exact path="/favourite" component={Favourite}>
-            <Posts title="Favourite posts" {...postsData} isLikedPosts />
+            <Posts title="Favourite posts" posts={likedPosts} isLoading={isLoading} error={error} isLikedPosts={isLikedPosts}/>
           </Route>
 
           <Route exact path="/settings">
-            <Settings title="Настройки пользователя" users={users} setUsers={setUsers} />
+            <Settings title="Настройки пользователя" users={users} />
           </Route>
 
           <Route path="/blog/:postId">
-            <BlogPostPage setPosts={postsData.setPosts} />
+            <BlogPostPage />
           </Route>
 
           <Route exact path="/">

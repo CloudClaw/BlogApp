@@ -12,7 +12,6 @@ export const UserData = ({
   email,
   selectUser,
   selectedUser,
-  setUsers,
 }) => {
 
   return (
@@ -27,7 +26,6 @@ export const UserData = ({
       </div>
       {showEditUserForm && (
         <EditUserData
-          setUsers={setUsers}
           setShowEditUserForm={setShowEditUserForm}
           selectedUser={selectedUser}
         />

@@ -5,12 +5,7 @@ import { Navigation } from './Navigation/Navigation';
 import './Sidebar.scss';
 import { User } from './User/User';
 
-export const Sidebar = ({ thumbnail, setIsLoggeIn }) => {
-  const handleLogOut = () => {
-    localStorage.removeItem('isLoggedIn');
-    setIsLoggeIn(false);
-  };
-
+export const Sidebar = ({ thumbnail }) => {
   return (
     <aside className="sidebar">
       <section className="sidebatTop">
@@ -18,7 +13,7 @@ export const Sidebar = ({ thumbnail, setIsLoggeIn }) => {
         <Navigation />
       </section>
       <section className="sidebarBottom">
-        <LogOut setIsLoggeIn={handleLogOut} />
+        <LogOut />
       </section>
     </aside>
   );
