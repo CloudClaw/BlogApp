@@ -18,8 +18,7 @@ export const PostsHeader = ({ title, isLikedPosts, posts, addNewPost, setPosts }
           Создать пост
         </button>
       )}
-
-      <SearchForm />
+      
       {showAddForm && (
         <AddForm
           addNewPost={addNewPost}
